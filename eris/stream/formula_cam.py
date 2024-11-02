@@ -5,6 +5,7 @@ import numpy as np
 from time import sleep as zzz
 import eris.stream
 
+
 def overlay_image(background, overlay, x_offset=0, y_offset=0):
     """
     Overlay one image on top of another with transparency.
