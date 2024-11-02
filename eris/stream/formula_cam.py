@@ -40,11 +40,11 @@ def overlay_image(background, overlay, x_offset=0, y_offset=0):
     # Get the overlay region
     overlay_region = overlay[y1_overlay:y2_overlay, x1_overlay:x2_overlay]
     
-    # Create a mask for non-zero pixels
+    # Create a mask for pixels that are neither 0 nor 255
     if overlay.ndim == 3:
-        mask = (overlay_region != 0).any(axis=2)
+        mask = ((overlay_region != 0) & (overlay_region != 255)).any(axis=2)
     else:
-        mask = overlay_region != 0
+        mask = (overlay_region != 0) & (overlay_region != 255)
         
     # Apply the overlay only where mask is True
     result[y1:y2, x1:x2][mask] = overlay_region[mask]
@@ -53,7 +53,7 @@ def overlay_image(background, overlay, x_offset=0, y_offset=0):
 
 def rotate_image(image, angle):
     image_center = tuple(np.array(image.shape[1::-1]) / 2)
-    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1)
     result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
     return result
 
@@ -84,6 +84,7 @@ class FormulaCamera:
         self.lap_count = 0
         self.driver_positions = ["M.Stapper", "Magic Alonso"]
         self.driver_color = [(200, 50, 0), (20, 200, 20)]
+        self.maxlaps = 12
 
     # Function to increment the lap counter
     def increment_lap(self):
@@ -127,7 +128,7 @@ class FormulaCamera:
             cv2.rectangle(frame, (10, 10), (210, 120), (0, 0, 0), -1)  # Background for the sidebar
 
             # Display lap counter
-            lap_text = f"Lap: {this.lap_count}"
+            lap_text = f"Lap: {this.lap_count}/{this.maxlaps}"
             cv2.putText(frame, lap_text, (20, 40), font, font_scale, font_color, font_thickness)
             
             cv2.rectangle(frame, (10, 45), (210, 46), (0, 0, 255), -1)
