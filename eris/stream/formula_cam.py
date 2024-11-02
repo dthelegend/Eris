@@ -1,9 +1,6 @@
-import importlib
-from importlib.resources import files
-
 import cv2
 import numpy as np
-import eris.stream
+from time import sleep as zzz
 
 def overlay_image(background, overlay, x_offset=0, y_offset=0):
     """
@@ -57,12 +54,33 @@ def rotate_image(image, angle):
     result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
     return result
 
+def onMouse(event, x, y, flags, param):
+    if event == cv2.EVENT_LBUTTONDOWN:
+       # draw circle here (etc...)
+       print('x = %d, y = %d'%(x, y))
+
+track_pos = [(90,310), (96,320), (102,327),
+    (113, 329), (123, 330), (129, 324), (137, 319), (143, 309),
+    (143, 302), (137, 290), (132, 283), (130, 278), (122, 269),
+    (119, 263), (116, 257), (113, 252), (110, 249), (105, 242),
+    (102, 236), (99, 227), (96, 222), (92, 210), (90, 208),
+    (85, 200), (82, 196), (79, 189), (80, 181), (80, 173),
+    (84, 168), (91, 163), (91, 163), (96, 160), (105, 160),
+    (111, 160), (118, 165), (122, 169), (126, 176), (126, 181),
+    (126, 187), (126, 192), (125, 199), (119, 201), (116, 205),
+    (113, 209), (102, 213), (92, 219), (85, 223), (77, 228),
+    (69, 233), (64, 242), (61, 250), (60, 256), (61, 264),
+    (67, 270), (71, 279), (75, 285), (81, 293), (85, 299),
+    (88, 307), (88, 308)
+]
+
 class FormulaCamera:
     def __init__(self):
 
         # Initialize lap count and driver positions
         self.lap_count = 0
         self.driver_positions = ["M.Stapper", "Magic Alonso"]
+        self.driver_color = [(200, 50, 0), (20, 200, 20)]
 
     # Function to increment the lap counter
     def increment_lap(self):
@@ -84,8 +102,12 @@ class FormulaCamera:
 
         # Open video capture (webcam)
         cap = cv2.VideoCapture(0)
+        time = 0
 
         while True:
+            time += 0.8
+            zzz(0.1)
+
             # Capture frame-by-frame
             ret, frame = cap.read()
             if not ret:
@@ -111,10 +133,18 @@ class FormulaCamera:
             # Display driver positions
             for i, driver in enumerate(this.driver_positions, start=1):
                 position_text = f"{i}. {driver}"
-                cv2.putText(frame, position_text, (20, 40 + i * 30), font, font_scale, font_color, font_thickness)
+                cv2.putText(frame, position_text, (20, 40 + i * 30), font, font_scale, this.driver_color[i-1], font_thickness)
+
+            
+            
+            cv2.circle(frame, track_pos[int(time % len(track_pos))], 3, (200, 0, 200), -1)
 
             # Display the resulting frame
-            cv2.imshow('Live Feed with Lap Counter and Position Board', frame)
+
+            cv2.imshow('Durhack Grand Prix', frame)
+            cv2.setMouseCallback('Durhack Grand Prix', onMouse)
+            
+
 
             # Keyboard controls
             key = cv2.waitKey(1) & 0xFF
