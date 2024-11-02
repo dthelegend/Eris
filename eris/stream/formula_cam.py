@@ -1,6 +1,9 @@
+from importlib.resources import files
+
 import cv2
 import numpy as np
 from time import sleep as zzz
+import eris.stream
 
 def overlay_image(background, overlay, x_offset=0, y_offset=0):
     """
