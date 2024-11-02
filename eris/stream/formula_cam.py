@@ -84,7 +84,8 @@ class FormulaCamera:
         # Initialize lap count and driver positions
         self.lap_count = 0
         self.driver_positions = ["M.Stapper", "Magic Alonso"]
-        self.driver_color = [(200, 50, 0), (20, 200, 20)]
+        self.driver_color = [(200, 90, 0), (20, 200, 20)]
+        self.driver_charge = [0.5, 0.9]
         self.maxlaps = 12
 
     # Function to increment the lap counter
@@ -93,8 +94,10 @@ class FormulaCamera:
 
     # Function to swap driver positions
     def swap_positions(self):
-        
         self.driver_positions[0], self.driver_positions[1] = self.driver_positions[1], self.driver_positions[0]
+
+    def updateCharge(self, car, delta):
+        self.driver_charge[car] += delta
 
     @staticmethod
     def main():
@@ -106,7 +109,7 @@ class FormulaCamera:
         font_thickness = 1
 
         # Open video capture (webcam)
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(1)
         time = 0
 
         while True:
@@ -126,20 +129,22 @@ class FormulaCamera:
 
 
             # Draw the lap counter and position board
-            cv2.rectangle(frame, (10, 10), (210, 120), (0, 0, 0), -1)  # Background for the sidebar
+            cv2.rectangle(frame, (10, 10), (220, 120), (60, 60, 60), -1)  # Background for the sidebar
 
             # Display lap counter
             lap_text = f"Lap: {this.lap_count}/{this.maxlaps}"
-            cv2.putText(frame, lap_text, (20, 40), font, font_scale, font_color, font_thickness)
+            cv2.putText(frame, lap_text, (40, 40), font, font_scale, font_color, font_thickness)
             
-            cv2.rectangle(frame, (10, 45), (210, 46), (0, 0, 255), -1)
-            cv2.rectangle(frame, (10, 10), (210, 15), (255, 0, 0), -1) 
+            cv2.rectangle(frame, (10, 45), (220, 46), (0, 0, 255), -1)
+            cv2.rectangle(frame, (10, 10), (220, 15), (255, 0, 0), -1) 
             cv2.rectangle(frame, (10, 10), (15, 120), (255, 0, 0), -1) 
             # Display driver positions
             for i, driver in enumerate(this.driver_positions, start=1):
                 position_text = f"{i}. {driver}"
-                cv2.putText(frame, position_text, (20, 40 + i * 30), font, font_scale, this.driver_color[i-1], font_thickness)
-
+                cv2.putText(frame, position_text, (20, 50 + i * 16), font, font_scale-0.2, this.driver_color[i-1], font_thickness)
+                # Charge Bar
+                cv2.rectangle(frame, (153, 40+i*16), (153 + 60, 50+i*16), (0,0,0), -1)
+                cv2.rectangle(frame, (153, 40+i*16), (153 + int((this.driver_charge[i-1] * 60)), 50+i*16), (0,255,0), -1)
             
             
             cv2.circle(frame, track_pos[int(time % len(track_pos))], 3, (200, 0, 200), -1)
