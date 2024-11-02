@@ -16,7 +16,7 @@ def test():
     cars = [Overdrive(GROUND_SHOCK), Overdrive(SKULL)]
     for car in cars:
         car.setLocationChangeCallback(locationChangeCallback)  # Set location change callback to function above
-        car.changeSpeed(1000, 500)  # Set car speed with speed = 500, acceleration = 500
-        car.changeLaneLeft(500, 500)  # Switch to next right lane with speed = 500, acceleration = 500
+        car.changeSpeed(0, 200)  # Set car speed with speed = 500, acceleration = 500
+        #car.changeLaneLeft(500, 500)  # Switch to next right lane with speed = 500, acceleration = 500
     input("Done.")  # Hold the program so it won't end abruptly
 
