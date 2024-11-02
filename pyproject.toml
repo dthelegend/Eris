@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.12"
 anki-overdrive = [{git="https://github.com/flyte/overdrive-python.git"}]
 fire = "^0.7.0"
+opencv-python = "^4.10.0.84"
 
 [build-system]
 requires = ["poetry-core"]

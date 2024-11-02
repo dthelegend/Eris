@@ -1,5 +1,9 @@
+import importlib
+from importlib.resources import files
+
 import cv2
 import numpy as np
+import eris.stream
 
 def overlay_image(background, overlay, x_offset=0, y_offset=0):
     """
@@ -60,8 +64,6 @@ class FormulaCamera:
         self.lap_count = 0
         self.driver_positions = ["M.Stapper", "Magic Alonso"]
 
-        self.main()
-
     # Function to increment the lap counter
     def increment_lap(self):
         self.lap_count += 1
@@ -71,8 +73,9 @@ class FormulaCamera:
         
         self.driver_positions[0], self.driver_positions[1] = self.driver_positions[1], self.driver_positions[0]
 
-    def main(self):
-
+    @staticmethod
+    def main():
+        this = FormulaCamera()
         # Font settings for display text
         font = cv2.FONT_HERSHEY_DUPLEX
         font_scale = 0.7
@@ -88,7 +91,7 @@ class FormulaCamera:
             if not ret:
                 break
             
-            track = cv2.imread("track.png")
+            track = cv2.imread(files(eris.stream).joinpath("track.png"))
             track = cv2.resize(track, (0, 0), fx=0.7, fy=0.7)
             track = rotate_image(track, 30)
 
@@ -99,14 +102,14 @@ class FormulaCamera:
             cv2.rectangle(frame, (10, 10), (210, 120), (0, 0, 0), -1)  # Background for the sidebar
 
             # Display lap counter
-            lap_text = f"Lap: {self.lap_count}"
+            lap_text = f"Lap: {this.lap_count}"
             cv2.putText(frame, lap_text, (20, 40), font, font_scale, font_color, font_thickness)
             
             cv2.rectangle(frame, (10, 45), (210, 46), (0, 0, 255), -1)
             cv2.rectangle(frame, (10, 10), (210, 15), (255, 0, 0), -1) 
             cv2.rectangle(frame, (10, 10), (15, 120), (255, 0, 0), -1) 
             # Display driver positions
-            for i, driver in enumerate(self.driver_positions, start=1):
+            for i, driver in enumerate(this.driver_positions, start=1):
                 position_text = f"{i}. {driver}"
                 cv2.putText(frame, position_text, (20, 40 + i * 30), font, font_scale, font_color, font_thickness)
 
@@ -118,12 +121,10 @@ class FormulaCamera:
             if key == ord('q'):
                 break  # Quit on 'q'
             elif key == ord('l'):
-                increment_lap()  # Increment lap count on 'l'
+                this.increment_lap()  # Increment lap count on 'l'
             elif key == ord('s'):
-                swap_positions()  # Swap positions on 's'
+                this.swap_positions()  # Swap positions on 's'
 
         # Release the capture and close windows
         cap.release()
         cv2.destroyAllWindows()
-
-FormulaCamera()
