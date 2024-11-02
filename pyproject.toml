@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "eris"
+version = "0.1.0"
+description = ""
+authors = ["DTheLegend <me@daudi.dev>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+anki-overdrive = [{git="https://github.com/flyte/overdrive-python.git"}]
+fire = "^0.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
