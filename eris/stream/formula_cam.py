@@ -63,19 +63,18 @@ def onMouse(event, x, y, flags, param):
        # draw circle here (etc...)
        print('x = %d, y = %d'%(x, y))
 
-track_pos = [(90,310), (96,320), (102,327),
-    (113, 329), (123, 330), (129, 324), (137, 319), (143, 309),
-    (143, 302), (137, 290), (132, 283), (130, 278), (122, 269),
-    (119, 263), (116, 257), (113, 252), (110, 249), (105, 242),
-    (102, 236), (99, 227), (96, 222), (92, 210), (90, 208),
-    (85, 200), (82, 196), (79, 189), (80, 181), (80, 173),
-    (84, 168), (91, 163), (91, 163), (96, 160), (105, 160),
-    (111, 160), (118, 165), (122, 169), (126, 176), (126, 181),
-    (126, 187), (126, 192), (125, 199), (119, 201), (116, 205),
-    (113, 209), (102, 213), (92, 219), (85, 223), (77, 228),
-    (69, 233), (64, 242), (61, 250), (60, 256), (61, 264),
-    (67, 270), (71, 279), (75, 285), (81, 293), (85, 299),
-    (88, 307), (88, 308)
+track_pos = [(90,310), (96,320), (102,327), (113, 329), (123, 330), 
+             (129, 324), (137, 319), (143, 309), (143, 302), (137, 290), 
+             (132, 283), (130, 278), (122, 269), (119, 263), (116, 257), 
+             (113, 252), (110, 249), (105, 242), (102, 236), (99, 227), 
+             (96, 222), (92, 210), (90, 208), (85, 200), (82, 196), 
+             (79, 189), (80, 181), (80, 173), (84, 168), (91, 163), 
+             (91, 163), (96, 160), (105, 160), (111, 160), (118, 165), 
+             (122, 169), (126, 176), (126, 181), (126, 187), (126, 192), 
+             (125, 199), (119, 201), (116, 205), (113, 209), (102, 213), 
+             (92, 219), (85, 223), (77, 228), (69, 233), (64, 242), 
+             (61, 250), (60, 256), (61, 264), (67, 270), (71, 279), 
+             (75, 285), (81, 293), (85, 299), (88, 307), (88, 308)
 ]
 
 class FormulaCamera:
@@ -83,9 +82,13 @@ class FormulaCamera:
 
         # Initialize lap count and driver positions
         self.lap_count = 0
-        self.driver_positions = ["M.Stapper", "Magic Alonso"]
+        self.driver_names = ["M.Stapper", "Magic Alonso"]
+        self.driver_positions = [0, 1]
         self.driver_color = [(200, 90, 0), (20, 200, 20)]
         self.driver_charge = [0.5, 0.9]
+        self.driver_progress = [0, 20]
+
+
         self.maxlaps = 5
 
         self.track = cv2.imread(files(eris.stream).joinpath("track.png"))
@@ -110,6 +113,11 @@ class FormulaCamera:
     # Function to swap driver positions
     def swap_positions(self):
         self.driver_positions[0], self.driver_positions[1] = self.driver_positions[1], self.driver_positions[0]
+
+    def updateProgress(self, car, delta):
+        self.driver_progress[car] += delta
+        if self.driver_progress[car] > 100:
+            self.driver_progress[car] -= 100
 
     def updateCharge(self, car, delta):
         self.driver_charge[car] += delta
@@ -141,13 +149,14 @@ class FormulaCamera:
 
         # Display driver positions
         for i, driver in enumerate(self.driver_positions, start=1):
-            position_text = f"{i}. {driver}"
-            cv2.putText(frame, position_text, (20, 50 + i * 16), self.font, self.font_scale-0.2, self.driver_color[i-1], self.font_thickness)
+
+            position_text = f"{i}. {self.driver_names[driver]}"
+            cv2.putText(frame, position_text, (20, 50 + i * 16), self.font, self.font_scale-0.2, self.driver_color[driver-1], self.font_thickness)
             # Charge Bar
             cv2.rectangle(frame, (153, 40+i*16), (153 + 60, 50+i*16), (0,0,0), -1)
-            cv2.rectangle(frame, (153, 40+i*16), (153 + int((self.driver_charge[i-1] * 60)), 50+i*16), (0,255,0), -1)
-        
-        # cv2.circle(frame, track_pos[int(self % len(track_pos))], 3, (200, 0, 200), -1)
+            cv2.rectangle(frame, (153, 40+i*16), (153 + int((self.driver_charge[driver] * 60)), 50+i*16), (0,255,0), -1)
+
+            cv2.circle(frame, track_pos[int(self.driver_progress[driver] % len(track_pos))], 3, self.driver_color[driver], -1)
 
         # Display the resulting frame
 
