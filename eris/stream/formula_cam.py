@@ -86,7 +86,7 @@ class FormulaCamera:
         self.driver_positions = ["M.Stapper", "Magic Alonso"]
         self.driver_color = [(200, 90, 0), (20, 200, 20)]
         self.driver_charge = [0.5, 0.9]
-        self.maxlaps = 12
+        self.maxlaps = 5
 
     # Function to increment the lap counter
     def increment_lap(self):
