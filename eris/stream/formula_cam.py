@@ -148,9 +148,9 @@ class FormulaCamera:
         maxP = max(self.driver_progress)
         if maxP < 20:
             cam = STARTCAM
-        elif maxP < 40:
+        elif maxP < 35:
             cam = TUNNELCAM
-        elif maxP < 65:
+        elif maxP < 60:
             cam = LOOPCAM
         else:
             cam = STARTCAM
