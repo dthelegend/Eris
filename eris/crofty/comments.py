@@ -5,9 +5,13 @@ from time import sleep as zzz
 import os
 from datetime import datetime
 
-prompt = """
+DRIVERB = "Dingle"
+DRIVERA = "Quandale"
+
+prompt = f"""
 ### Instruction ###
-You are the commentator for a motorsport race between two cars. 
+You are the commentator for a 1v1 motorsport race. 
+There are two drivers, {DRIVERA} and {DRIVERB}.
 Commentate it live like Crofty from Formula 1.
 Respond in one fast sentence.
 Reacting to each moment as it happens.
@@ -28,7 +32,7 @@ class Crofty():
 
     def chat(self, data):
         self.prompt = prompt + "\n" + data
-        return self.llm.invoke(self.prompt)
+        return self.llm.invoke(self.prompt).lower()
 
     def speak(self, data):
         myobj = gTTS(text=data[1:-1], lang='en', slow=False, tld='co.uk')
@@ -47,19 +51,26 @@ class Crofty():
     def test():
         this = Crofty()
 
-        response = this.chat("""### Event ###
-                             The Durhack Grand Prix is on it's way!""")
+        response = this.chat(f"""### INSTRUCTION ###
+                             The Durhack Grand Prix in Durham is beginning soon! Tell us about it, and our two drivers: {DRIVERA} and {DRIVERB}""")
         print(response)
         this.speak(response)
 
         response = this.chat("""### Event ###
-                             Racer A has just overtook Racer B after Racer B took a corner too wide!""")
+                             The lights are out, and the race is underway!""")
         print(response)
         this.speak(response)
 
         print("\n")
         response = this.chat("""### Event ###
-                             Racer A almost comes off the track as the back left wheel locks up!""")
+                             f{DRIVERA} almost comes off the track as the back left wheel locks up!""")
         print(response)
         this.speak(response)
+
+        print("\n")
+        response = this.chat("""### Event ###
+                             f{DRIVERA} isn't happy at {DRIVERB}! He's just cut him off""")
+        print(response)
+        this.speak(response)
+
         this.cleanup()
