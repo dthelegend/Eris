@@ -13,6 +13,7 @@ langchain-ollama = "^0.2.0"
 gtts = "^2.5.3"
 pygame = "^2.6.1"
 py-drivesdk = "^1.0.3"
+pyserial = "^3.5"
 
 [build-system]
 requires = ["poetry-core"]
