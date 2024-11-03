@@ -159,6 +159,8 @@ class FormulaCamera:
 
         ret, frame = self.cameras[cam].read()
 
+        
+        frame = cv2.resize(frame, (0, 0), fx=0.2, fy=0.2)
         frame = overlay_image(frame, self.track, -70, 120)
         # Draw the lap counter and position board
         cv2.rectangle(frame, (10, 10), (220, 120), (60, 60, 60), -1)  # Background for the sidebar
