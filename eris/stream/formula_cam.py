@@ -184,6 +184,8 @@ class FormulaCamera:
 
         #cv2.namedWindow('custom window', cv2.WINDOW_KEEPRATIO)
         cv2.imshow('custom window', frame)
+        
+        cv2.setWindowProperty('custom window', 1, cv2.WINDOW_NORMAL)
         cv2.resizeWindow('custom window', 1000, 1000)
         #cv2.setMouseCallback('Durhack Grand Prix', onMouse)
 
