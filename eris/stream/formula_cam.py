@@ -90,11 +90,14 @@ class FormulaCamera:
 
         self.track = cv2.imread(files(eris.stream).joinpath("track.png"))
         self.track = cv2.resize(self.track, (0, 0), fx=0.7, fy=0.7)
-        rotate_image(self.track, 30)
-        
-        self.cameras = [cv2.VideoCapture(1)]
+        self.track = rotate_image(self.track, 30)
 
-        
+        self.cameras = []
+        for i in range(10):
+            cam = cv2.VideoCapture(i)
+            if cam.isOpened():
+                self.cameras.append(cam)
+
         self.font = cv2.FONT_HERSHEY_DUPLEX
         self.font_scale = 0.7
         self.font_color = (255, 255, 255)
@@ -131,7 +134,7 @@ class FormulaCamera:
         cv2.rectangle(frame, (10, 10), (220, 120), (60, 60, 60), -1)  # Background for the sidebar
         # Display lap counter
         lap_text = f"Lap: {self.lap_count}/{self.maxlaps}"
-        cv2.putText(frame, lap_text, (40, 40), font, font_scale, font_color, font_thickness)
+        cv2.putText(frame, lap_text, (40, 40), self.font, self.font_scale, self.font_color, self.font_thickness)
         cv2.rectangle(frame, (10, 45), (220, 46), (0, 0, 255), -1)
         cv2.rectangle(frame, (10, 10), (220, 15), (255, 0, 0), -1) 
         cv2.rectangle(frame, (10, 10), (15, 120), (255, 0, 0), -1) 
@@ -144,7 +147,7 @@ class FormulaCamera:
             cv2.rectangle(frame, (153, 40+i*16), (153 + 60, 50+i*16), (0,0,0), -1)
             cv2.rectangle(frame, (153, 40+i*16), (153 + int((self.driver_charge[i-1] * 60)), 50+i*16), (0,255,0), -1)
         
-        cv2.circle(frame, track_pos[int(self % len(track_pos))], 3, (200, 0, 200), -1)
+        # cv2.circle(frame, track_pos[int(self % len(track_pos))], 3, (200, 0, 200), -1)
 
         # Display the resulting frame
 
