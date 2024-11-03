@@ -177,7 +177,9 @@ class FormulaCamera:
 
         # Display the resulting frame
 
-        cv2.imshow('Durhack Grand Prix', frame)
+        cv2.namedWindow('custom window', cv2.WINDOW_KEEPRATIO)
+        cv2.imshow('custom window', frame)
+        cv2.resizeWindow('custom window', 600, 600)
         #cv2.setMouseCallback('Durhack Grand Prix', onMouse)
 
         # Keyboard controls
