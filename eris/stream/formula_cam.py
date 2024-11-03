@@ -88,9 +88,10 @@ class FormulaCamera:
         self.driver_charge = [0.5, 0.9]
         self.maxlaps = 5
 
-        track = cv2.imread(files(eris.stream).joinpath("track.png"))
-        track = cv2.resize(track, (0, 0), fx=0.7, fy=0.7)
-        self.track = rotate_image(track, 30)
+        self.track = cv2.imread(files(eris.stream).joinpath("track.png"))
+        self.track = cv2.resize(self.track, (0, 0), fx=0.7, fy=0.7)
+        rotate_image(self.track, 30)
+        
         self.cameras = [cv2.VideoCapture(1)]
 
         
