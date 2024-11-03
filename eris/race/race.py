@@ -124,6 +124,7 @@ class RaceCar:
                 await asyncio.gather(*(car.mainloop() for car in race_ready_cars))
                 if run_stream:
                     stream.update_progress_all([car.position for car in race_ready_cars])
+                    stream.update_distance_all([car.position + car.lap_number*100 for car in race_ready_cars])
                     stream.set_lap(current_lap)
                 if run_lights and (not has_waved) and (current_lap + 1 > NUM_LAPS):
                     has_waved = True

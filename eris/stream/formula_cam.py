@@ -88,7 +88,8 @@ class FormulaCamera:
         self.driver_positions = [0, 1]
         self.driver_color = [(200, 90, 0), (20, 80, 230)]
         self.driver_charge = [0.5, 0.9]
-        self.driver_progress = [0, 20]
+        self.driver_progress = [0, 0]
+        self.driver_distance = [0, 0]
 
 
         self.maxlaps = 5
@@ -118,11 +119,16 @@ class FormulaCamera:
 
     def update_progress_all(self, data):
         self.driver_progress = data
+    
+    def update_distance_all(self, data):
+        self.driver_distance = data
         if data[1] > data[0]:
             self.driver_positions = [1, 0]
         else:
             self.driver_positions = [0, 1]
             
+    def update_distance(self, data):
+        self.driver_distance = data
 
     def updateProgress(self, car, delta):
         self.driver_progress[car] += delta
