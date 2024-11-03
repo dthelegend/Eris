@@ -15,7 +15,7 @@ HARVESTSPEED = 600
 NORMALSPEED = 800
 HIGHSPEED = 1000
 
-class basicAgent:
+class BasicAgent:
     def __init__(self):
         self.energy = 50
     

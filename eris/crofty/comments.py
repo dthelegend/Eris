@@ -1,3 +1,6 @@
+import asyncio
+import tempfile
+
 from langchain_ollama import OllamaLLM
 from gtts import gTTS
 import pygame
@@ -18,59 +21,58 @@ Reacting to each moment as it happens.
 Stay in character and wait for data.
 """
 
-class Crofty():
+class Crofty:
     def __init__(self):
         self.llm = OllamaLLM(model="llama3.2:1b")
         self.prompt = prompt
         pygame.mixer.init()
-        self.names = []
 
     def cleanup(self):
         pygame.mixer.quit()
-        for i in self.names:
-            os.remove(i)
 
     def chat(self, data):
         self.prompt = prompt + "\n" + data
         return self.llm.invoke(self.prompt).lower()
 
-    def speak(self, data):
+    async def speak(self, data):
         myobj = gTTS(text=data[1:-1], lang='en', slow=False, tld='co.uk')
-        
-        date_string = datetime.now().strftime("%d%m%Y%H%M%S")
 
-        myobj.save(f"{date_string}.mp3")
-        self.names.append(f"{date_string}.mp3")
-        pygame.mixer.music.load(f"{date_string}.mp3")
+        temp_file = tempfile.TemporaryFile(suffix='.mp3')
+        myobj.write_to_fp(temp_file)
+        temp_file.flush()
+
+        temp_file.seek(0)
+        pygame.mixer.music.load(temp_file, namehint = ".mp3")
         # Play the loaded mp3 file
         pygame.mixer.music.play()
         while pygame.mixer.music.get_busy():
-            pass
+            await asyncio.sleep(0.5)
+        pygame.mixer.music.unload()
 
     @staticmethod
-    def test():
+    async def test():
         this = Crofty()
 
         response = this.chat(f"""### INSTRUCTION ###
                              The Durhack Grand Prix in Durham is beginning soon! Tell us about it, and our two drivers: {DRIVERA} and {DRIVERB}""")
         print(response)
-        this.speak(response)
+        await this.speak(response)
 
         response = this.chat("""### Event ###
                              The lights are out, and the race is underway!""")
         print(response)
-        this.speak(response)
+        await this.speak(response)
 
         print("\n")
-        response = this.chat("""### Event ###
-                             f{DRIVERA} almost comes off the track as the back left wheel locks up!""")
+        response = this.chat(f"""### Event ###
+                             {DRIVERA} almost comes off the track as the back left wheel locks up!""")
         print(response)
-        this.speak(response)
+        await this.speak(response)
 
         print("\n")
-        response = this.chat("""### Event ###
-                             f{DRIVERA} isn't happy at {DRIVERB}! He's just cut him off""")
+        response = this.chat(f"""### Event ###
+                             {DRIVERA} isn't happy at {DRIVERB}! He's just cut him off""")
         print(response)
-        this.speak(response)
+        await this.speak(response)
 
         this.cleanup()
