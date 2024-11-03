@@ -84,9 +84,9 @@ class FormulaCamera:
 
         # Initialize lap count and driver positions
         self.lap_count = 0
-        self.driver_names = ["M.Stapper", "Magic Alonso"]
+        self.driver_names = ["Oli", "Rahul"]
         self.driver_positions = [0, 1]
-        self.driver_color = [(200, 90, 0), (20, 200, 20)]
+        self.driver_color = [(200, 90, 0), (20, 80, 230)]
         self.driver_charge = [0.5, 0.9]
         self.driver_progress = [0, 20]
 
@@ -176,7 +176,7 @@ class FormulaCamera:
             cv2.rectangle(frame, (153, 40+i*16), (153 + 60, 50+i*16), (0,0,0), -1)
             cv2.rectangle(frame, (153, 40+i*16), (153 + int((self.driver_charge[driver] * 60)), 50+i*16), (0,255,0), -1)
 
-            cv2.circle(frame, track_pos[int(self.driver_progress[driver] % len(track_pos))], 3, self.driver_color[driver], -1)
+            cv2.circle(frame, track_pos[int(self.driver_progress[driver] % len(track_pos))], 4visual, self.driver_color[driver], -1)
 
         # Display the resulting frame
 

@@ -8,8 +8,8 @@ from time import sleep as zzz
 import os
 from datetime import datetime
 
-DRIVERB = "Dingle"
-DRIVERA = "Quandale"
+DRIVERB = "Oli"
+DRIVERA = "Rahul"
 
 prompt = f"""
 ### Instruction ###
