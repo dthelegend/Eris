@@ -5,6 +5,9 @@ import numpy as np
 from time import sleep as zzz
 import eris.stream
 
+TUNNELCAM = 1
+STARTCAM = 2
+LOOPCAM = 3
 
 def overlay_image(background, overlay, x_offset=0, y_offset=0):
     """
@@ -138,7 +141,18 @@ class FormulaCamera:
     def display(self):
         
         # Capture frame-by-frame
-        ret, frame = self.cameras[0].read()
+        cam = 0
+        maxP = max(self.driver_progress)
+        if maxP < 20:
+            cam = STARTCAM
+        elif maxP < 50:
+            cam = TUNNELCAM
+        elif maxP < 80:
+            cam = LOOPCAM
+        else:
+            cam = STARTCAM
+
+        ret, frame = self.cameras[cam].read()
 
         frame = overlay_image(frame, self.track, -70, 120)
         # Draw the lap counter and position board
