@@ -43,9 +43,9 @@ def overlay_image(background, overlay, x_offset=0, y_offset=0):
     
     # Create a mask for pixels that are neither 0 nor 255
     if overlay.ndim == 3:
-        mask = ((overlay_region != 0) & (overlay_region != 255)).any(axis=2)
+        mask = ((overlay_region > 5) & (overlay_region < 245)).any(axis=2)
     else:
-        mask = (overlay_region != 0) & (overlay_region != 255)
+        mask = ((overlay_region > 5) & (overlay_region < 245))
         
     # Apply the overlay only where mask is True
     result[y1:y2, x1:x2][mask] = overlay_region[mask]
@@ -88,6 +88,17 @@ class FormulaCamera:
         self.driver_charge = [0.5, 0.9]
         self.maxlaps = 5
 
+        track = cv2.imread(files(eris.stream).joinpath("track.png"))
+        track = cv2.resize(track, (0, 0), fx=0.7, fy=0.7)
+        self.track = rotate_image(track, 30)
+        self.cameras = [cv2.VideoCapture(1)]
+
+        
+        self.font = cv2.FONT_HERSHEY_DUPLEX
+        self.font_scale = 0.7
+        self.font_color = (255, 255, 255)
+        self.font_thickness = 1
+
     # Function to increment the lap counter
     def increment_lap(self):
         self.lap_count += 1
@@ -103,68 +114,54 @@ class FormulaCamera:
     def main():
         this = FormulaCamera()
         # Font settings for display text
-        font = cv2.FONT_HERSHEY_DUPLEX
-        font_scale = 0.7
-        font_color = (255, 255, 255)
-        font_thickness = 1
-
         # Open video capture (webcam)
-        cap = cv2.VideoCapture(1)
-        time = 0
+        while this.display():
+            pass
+    
+        this.releaseCams()
 
-        while True:
-            time += 0.8
-            zzz(0.1)
+    def display(self):
+        
+        # Capture frame-by-frame
+        ret, frame = self.cameras[0].read()
 
-            # Capture frame-by-frame
-            ret, frame = cap.read()
-            if not ret:
-                break
-            
-            track = cv2.imread(files(eris.stream).joinpath("track.png"))
-            track = cv2.resize(track, (0, 0), fx=0.7, fy=0.7)
-            track = rotate_image(track, 30)
+        frame = overlay_image(frame, self.track, -70, 120)
+        # Draw the lap counter and position board
+        cv2.rectangle(frame, (10, 10), (220, 120), (60, 60, 60), -1)  # Background for the sidebar
+        # Display lap counter
+        lap_text = f"Lap: {self.lap_count}/{self.maxlaps}"
+        cv2.putText(frame, lap_text, (40, 40), font, font_scale, font_color, font_thickness)
+        cv2.rectangle(frame, (10, 45), (220, 46), (0, 0, 255), -1)
+        cv2.rectangle(frame, (10, 10), (220, 15), (255, 0, 0), -1) 
+        cv2.rectangle(frame, (10, 10), (15, 120), (255, 0, 0), -1) 
 
-            frame = overlay_image(frame, track, -70, 120)
+        # Display driver positions
+        for i, driver in enumerate(self.driver_positions, start=1):
+            position_text = f"{i}. {driver}"
+            cv2.putText(frame, position_text, (20, 50 + i * 16), self.font, self.font_scale-0.2, self.driver_color[i-1], self.font_thickness)
+            # Charge Bar
+            cv2.rectangle(frame, (153, 40+i*16), (153 + 60, 50+i*16), (0,0,0), -1)
+            cv2.rectangle(frame, (153, 40+i*16), (153 + int((self.driver_charge[i-1] * 60)), 50+i*16), (0,255,0), -1)
+        
+        cv2.circle(frame, track_pos[int(self % len(track_pos))], 3, (200, 0, 200), -1)
 
+        # Display the resulting frame
 
-            # Draw the lap counter and position board
-            cv2.rectangle(frame, (10, 10), (220, 120), (60, 60, 60), -1)  # Background for the sidebar
+        cv2.imshow('Durhack Grand Prix', frame)
+        #cv2.setMouseCallback('Durhack Grand Prix', onMouse)
 
-            # Display lap counter
-            lap_text = f"Lap: {this.lap_count}/{this.maxlaps}"
-            cv2.putText(frame, lap_text, (40, 40), font, font_scale, font_color, font_thickness)
-            
-            cv2.rectangle(frame, (10, 45), (220, 46), (0, 0, 255), -1)
-            cv2.rectangle(frame, (10, 10), (220, 15), (255, 0, 0), -1) 
-            cv2.rectangle(frame, (10, 10), (15, 120), (255, 0, 0), -1) 
-            # Display driver positions
-            for i, driver in enumerate(this.driver_positions, start=1):
-                position_text = f"{i}. {driver}"
-                cv2.putText(frame, position_text, (20, 50 + i * 16), font, font_scale-0.2, this.driver_color[i-1], font_thickness)
-                # Charge Bar
-                cv2.rectangle(frame, (153, 40+i*16), (153 + 60, 50+i*16), (0,0,0), -1)
-                cv2.rectangle(frame, (153, 40+i*16), (153 + int((this.driver_charge[i-1] * 60)), 50+i*16), (0,255,0), -1)
-            
-            
-            cv2.circle(frame, track_pos[int(time % len(track_pos))], 3, (200, 0, 200), -1)
+        # Keyboard controls
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            return False  # Quit on 'q'
+        elif key == ord('l'):
+            self.increment_lap()  # Increment lap count on 'l'
+        elif key == ord('s'):
+            self.swap_positions()  # Swap positions on 's'
+        
+        return True
 
-            # Display the resulting frame
-
-            cv2.imshow('Durhack Grand Prix', frame)
-            cv2.setMouseCallback('Durhack Grand Prix', onMouse)
-            
-
-
-            # Keyboard controls
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord('q'):
-                break  # Quit on 'q'
-            elif key == ord('l'):
-                this.increment_lap()  # Increment lap count on 'l'
-            elif key == ord('s'):
-                this.swap_positions()  # Swap positions on 's'
-
+    def releaseCams(self):
         # Release the capture and close windows
-        cap.release()
+        self.cameras[0].release()
         cv2.destroyAllWindows()
