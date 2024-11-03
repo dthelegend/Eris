@@ -5,8 +5,8 @@ import numpy as np
 from time import sleep as zzz
 import eris.stream
 
-TUNNELCAM = 1
-STARTCAM = 2
+TUNNELCAM = 2
+STARTCAM = 4
 LOOPCAM = 3
 
 def overlay_image(background, overlay, x_offset=0, y_offset=0):
@@ -99,7 +99,7 @@ class FormulaCamera:
         self.track = rotate_image(self.track, 30)
 
         self.cameras = []
-        for i in range(10):
+        for i in range(20):
             cam = cv2.VideoCapture(i)
             if cam.isOpened():
                 self.cameras.append(cam)
@@ -110,8 +110,8 @@ class FormulaCamera:
         self.font_thickness = 1
 
     # Function to increment the lap counter
-    def increment_lap(self):
-        self.lap_count += 1
+    def set_lap(self, lap_count : int):
+        self.lap_count = lap_count
 
     # Function to swap driver positions
     def swap_positions(self):
@@ -145,7 +145,7 @@ class FormulaCamera:
         maxP = max(self.driver_progress)
         if maxP < 20:
             cam = STARTCAM
-        elif maxP < 30:
+        elif maxP < 40:
             cam = TUNNELCAM
         elif maxP < 65:
             cam = LOOPCAM
