@@ -157,8 +157,6 @@ class FormulaCamera:
 
         ret, frame = self.cameras[cam].read()
 
-        
-        frame = cv2.resize(frame, (0, 0), fx=0.2, fy=0.2)
         frame = overlay_image(frame, self.track, -70, 120)
         # Draw the lap counter and position board
         cv2.rectangle(frame, (10, 10), (220, 120), (60, 60, 60), -1)  # Background for the sidebar
@@ -183,10 +181,12 @@ class FormulaCamera:
         # Display the resulting frame
 
         #cv2.namedWindow('custom window', cv2.WINDOW_KEEPRATIO)
+        
+        frame = cv2.resize(frame, (0, 0), fx=2, fy=2)
         cv2.imshow('custom window', frame)
         
-        cv2.setWindowProperty('custom window', 1, cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('custom window', 1000, 1000)
+        #cv2.setWindowProperty('custom window', 1, cv2.WINDOW_NORMAL)
+        #cv2.resizeWindow('custom window', 1000, 1000)
         #cv2.setMouseCallback('Durhack Grand Prix', onMouse)
 
         # Keyboard controls
