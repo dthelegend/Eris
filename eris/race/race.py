@@ -11,6 +11,45 @@ import eris.lights
 from eris.stream import FormulaCamera
 
 NUM_LAPS = 5
+HARVESTSPEED = 600
+NORMALSPEED = 800
+HIGHSPEED = 1000
+
+class basicAgent:
+    def __init__(self):
+        self.energy = 50
+    
+    def act(self, lap_number, opponent_distance, opponent_lane, current_lane, current_piece_type): #Basic Agent
+        desired_speed = NORMALSPEED #base
+        if self.lap_number == NUM_LAPS-1:
+            #Last lap, go all out!
+            desired_speed = HIGHSPEED
+        else:
+            if opponent_distance < 1:
+                desired_speed = HIGHSPEED
+            elif opponent_distance > 2 and self.energy < 50:
+                desired_speed = HARVESTSPEED
+            elif self.energy > 80:
+                desired_speed = HIGHSPEED
+            elif self.energy < 30:
+                desired_speed = HARVESTSPEED
+            else:
+                desired_speed = NORMALSPEED
+            
+        if self.energy <= 0 and desired_speed == HIGHSPEED:
+            desired_speed = NORMALSPEED
+
+        if desired_speed == HIGHSPEED:
+            self.energy -= 5
+        elif desired_speed == HARVESTSPEED:
+            self.energy += 8
+        
+        if current_piece_type == TrackPieceType.CURVE:
+            desired_speed -= 100
+
+        return (desired_speed, (current_lane == opponent_lane) and desired_speed == HIGHSPEED)
+            
+
 
 class RaceCar:
     def __init__(self, car: Vehicle):
