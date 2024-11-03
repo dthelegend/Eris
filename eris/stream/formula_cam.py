@@ -145,9 +145,9 @@ class FormulaCamera:
         maxP = max(self.driver_progress)
         if maxP < 20:
             cam = STARTCAM
-        elif maxP < 40:
+        elif maxP < 30:
             cam = TUNNELCAM
-        elif maxP < 70:
+        elif maxP < 65:
             cam = LOOPCAM
         else:
             cam = STARTCAM
@@ -177,9 +177,9 @@ class FormulaCamera:
 
         # Display the resulting frame
 
-        cv2.namedWindow('custom window', cv2.WINDOW_KEEPRATIO)
+        #cv2.namedWindow('custom window', cv2.WINDOW_KEEPRATIO)
         cv2.imshow('custom window', frame)
-        cv2.resizeWindow('custom window', 600, 600)
+        cv2.resizeWindow('custom window', 1000, 1000)
         #cv2.setMouseCallback('Durhack Grand Prix', onMouse)
 
         # Keyboard controls
