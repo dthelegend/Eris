@@ -114,6 +114,9 @@ class FormulaCamera:
     def swap_positions(self):
         self.driver_positions[0], self.driver_positions[1] = self.driver_positions[1], self.driver_positions[0]
 
+    def update_progress_all(self, data):
+        self.driver_progress = data
+
     def updateProgress(self, car, delta):
         self.driver_progress[car] += delta
         if self.driver_progress[car] > 100:
