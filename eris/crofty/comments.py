@@ -49,6 +49,30 @@ class Crofty:
             await asyncio.sleep(0.5)
         pygame.mixer.music.unload()
 
+    async def race_start(self):
+        response = self.chat(f"""### INSTRUCTION ###
+                             The Durhack Grand Prix in Durham is beginning soon! Tell us about it, and our two drivers: {DRIVERA} and {DRIVERB}""")
+        print(response)
+        await self.speak(response)
+    
+    async def lights_out(self):
+        response = self.chat("""### Event ###
+                             The lights are out, and the race is underway!""")
+        print(response)
+        await self.speak(response)
+    
+    async def last_lap(self):
+        response = self.chat("""### Event ###
+                             The checked flag is waving, who's going to take the lead?""")
+        print(response)
+        await self.speak(response)        
+    
+    async def victory(self, driver):
+        response = self.chat(f"""### Event ###
+                             And it's done! {DRIVERA if driver else DRIVERB} takes the victory!""")
+        print(response)
+        await self.speak(response)
+
     @staticmethod
     async def test():
         this = Crofty()
@@ -71,7 +95,7 @@ class Crofty:
 
         print("\n")
         response = this.chat(f"""### Event ###
-                             {DRIVERA} isn't happy at {DRIVERB}! He's just cut him off""")
+                             And it's done! {DRIVERA} takes the victory!""")
         print(response)
         await this.speak(response)
 
