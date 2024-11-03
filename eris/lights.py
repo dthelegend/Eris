@@ -34,5 +34,5 @@ class ArduinoStuff:
             await asyncio.sleep(0.1)
         return
 
-    def done():
-        send_command("WAVE")
+    def done(self):
+        self.send_command("WAVE")

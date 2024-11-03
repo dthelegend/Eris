@@ -76,10 +76,10 @@ class RaceCar:
         await self.car.stop()
 
     @staticmethod
-    async def main(num_cars_to_connect = 2, run_stream = False, run_lights = False):
-        try:
-            controller = Controller()
+    async def main(num_cars_to_connect = 2, run_stream = False, run_lights = False, run_crofty = False):
+        controller = Controller()
 
+        try:
             if num_cars_to_connect > 4:
                 raise ValueError("Too many cars to connect")
             elif num_cars_to_connect == 0:
@@ -88,12 +88,17 @@ class RaceCar:
             print(f"Drivers are putting on their helmets...")
             vehicles = await controller.connect_many(num_cars_to_connect)
 
-            print(f"Drivers are lining up...")
-            _map = await controller.scan()
-
-            lights = False
+            lights = None
             if run_lights:
                 lights = eris.lights.ArduinoStuff()
+
+            crofty = None
+            if run_crofty:
+                crofty = eris.crofty.Crofty()
+                asyncio.create_task(crofty.race_start())
+
+            print(f"Drivers are lining up...")
+            _map = await controller.scan()
 
             await asyncio.gather(*(car.align() for car in vehicles))
 
@@ -103,13 +108,17 @@ class RaceCar:
                 await lights.lez_go()
 
             race_ready_cars : list[RaceCar] = [RaceCar(args) for args in vehicles]
-
             stream = None
             if run_stream:
                 stream = FormulaCamera()
                 stream.maxlaps = NUM_LAPS
 
-            await asyncio.gather(*(car.start() for car in race_ready_cars))
+            start_tasks = [car.start() for car in race_ready_cars]
+
+            if run_crofty:
+                asyncio.create_task(crofty.lights_out())
+
+            await asyncio.gather(*start_tasks)
             has_waved = False
             while ((current_lap := max(car.lap_number for car in race_ready_cars)) <= NUM_LAPS) and (not run_stream or stream.display()):
                 await asyncio.gather(*(car.mainloop() for car in race_ready_cars))
@@ -119,13 +128,19 @@ class RaceCar:
                 if run_lights and (not has_waved) and (current_lap + 1 > NUM_LAPS):
                     has_waved = True
                     lights.done()
+                    if run_crofty:
+                        asyncio.create_task(crofty.last_lap())
 
+                await asyncio.sleep(1 / 60)
+
+            if run_crofty:
+                asyncio.create_task(crofty.victory(max((idx, car.lap_number, car.position) for idx, car in enumerate(race_ready_cars))[0] == 0))
             await asyncio.gather(*(car.set_speed(300) for car in vehicles))
             await asyncio.sleep(3)
             await asyncio.gather(*(car.align() for car in vehicles))
             await asyncio.gather(*(car.stop() for car in race_ready_cars))
 
             await controller.disconnect_all()
-        except:
-            await asyncio.gather(*(car.stop() for car in race_ready_cars))
+        except Exception as e:
             await controller.disconnect_all()
+            raise e
