@@ -119,6 +119,11 @@ class FormulaCamera:
 
     def update_progress_all(self, data):
         self.driver_progress = data
+        if data[1] > data[0]:
+            self.driver_positions = [1, 0]
+        else:
+            self.driver_positions = [0, 1]
+            
 
     def updateProgress(self, car, delta):
         self.driver_progress[car] += delta
