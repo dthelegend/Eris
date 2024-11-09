@@ -182,7 +182,7 @@ class FormulaCamera:
             cv2.rectangle(frame, (153, 40+i*16), (153 + 60, 50+i*16), (0,0,0), -1)
             cv2.rectangle(frame, (153, 40+i*16), (153 + int((self.driver_charge[driver] * 60)), 50+i*16), (0,255,0), -1)
 
-            cv2.circle(frame, track_pos[int(self.driver_progress[driver] % len(track_pos))], 4visual, self.driver_color[driver], -1)
+            cv2.circle(frame, track_pos[int(self.driver_progress[driver] % len(track_pos))], 4, self.driver_color[driver], -1)
 
         # Display the resulting frame
 
